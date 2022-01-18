@@ -1,18 +1,28 @@
 import React, { useState } from "react";
 import axios from "axios";
+import FormattedDate from "./FormattedDate.js";
 
 export default function Weather() {
   let [ready, setReady] = useState(false);
   let [currentCity, setCurrentCity] = useState("");
   let [temperature, setTemperature] = useState("");
+  let [weatherData, setWeatherData] = useState({});
 
   function showTemperature(response) {
     setTemperature(Math.round(response.data.main.temp));
+    setWeatherData({
+      ready: true,
+      description: response.data.weather[0].description,
+      humidity: response.data.main.humidity,
+      wind: response.data.wind.speed,
+      date: new Date(response.data.dt * 1000),
+    });
   }
 
   function handleSubmit(event) {
     event.preventDefault();
     setCurrentCity(event.target.value);
+    setReady(true);
   }
 
   function search() {
@@ -34,6 +44,7 @@ export default function Weather() {
               autoFocus="on"
               autoComplete="off"
               id="search-form"
+              onChange={handleSubmit}
             />
           </form>
           <div className="row">
@@ -50,14 +61,16 @@ export default function Weather() {
               </h2>
               <br />
               <h3 id="current-date">
-                <span>last updated at 16:00, Wed</span>
+                <FormattedDate date={weatherData.date} />
               </h3>
             </div>
           </div>
 
           <div className="weather-elements">
             <span>
-              <span>broken clouds </span>
+              <span className="text-capitalize">
+                {weatherData.description}{" "}
+              </span>
             </span>
             <span className="separator">| </span>
 
